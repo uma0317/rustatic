@@ -7,12 +7,13 @@ use std::path::Path;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use { SOURCE_PATH, SOURCE_POSTS_PATH, GENERATED_POSTS_PATH, LAYOUTS_POSTS_PATH };
+use { utils, SOURCE_PATH, SOURCE_POSTS_PATH, GENERATED_POSTS_PATH, LAYOUTS_POSTS_PATH };
 
 pub fn init() {
     let matches = build().get_matches();
     arg_init(&matches);
     arg_new(&matches);
+    arg_generate(&matches);
 }
 
 pub fn build() -> App<'static, 'static> {
@@ -20,7 +21,6 @@ pub fn build() -> App<'static, 'static> {
         .version("0.1.0")                       
         .author("myname <myname@mail.com>")     
         .about("Clap Example CLI")              
-        .help("sample positional argument")  
         .subcommand(SubCommand::with_name("init")
             .about("init new blog")
             .arg(Arg::with_name("Blog name")
@@ -36,6 +36,9 @@ pub fn build() -> App<'static, 'static> {
                 .required(true)
                 .takes_value(true) 
             )
+        )
+        .subcommand(SubCommand::with_name("generate")
+            .about("generate static files")
         )
 
         .subcommand(SubCommand::with_name("add")
@@ -99,9 +102,17 @@ pub fn arg_new(matches: &ArgMatches) -> io::Result<()> {
             let article_path = day_path.join(
                 format!("{}_{}_{}_{}.md", date.hour(), date.minute(), date.second(), article_title)
             );
-            
+
             fs::File::create(article_path)?;
         }
+    }
+
+    Ok(())
+}
+
+pub fn arg_generate(matches: &ArgMatches) -> io::Result<()> {
+    if let Some(ref matches) = matches.subcommand_matches("generate") {
+        utils::generate_html_files();
     }
 
     Ok(())

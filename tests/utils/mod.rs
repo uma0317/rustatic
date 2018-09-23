@@ -15,3 +15,8 @@ fn it_count_md_files() {
 fn html_generate_test() {
     utils::create_html_file("test", "hi");
 }
+
+#[test]
+fn htmls_generate_test() {
+    utils::generate_html_files();
+}
