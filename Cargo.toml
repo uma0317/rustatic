@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["uma0317 <blog3170@gmail.com>"]
 
 [dependencies]
-pulldown-cmark = { version = "0.0.11", default-features = false }
+comrak = "0.3"
