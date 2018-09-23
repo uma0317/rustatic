@@ -10,3 +10,8 @@ fn it_convert_md_to_html() {
 fn it_count_md_files() {
     assert_eq!(utils::count_md_files().unwrap(), 3);
 }
+
+#[test]
+fn html_generate_test() {
+    utils::create_html_file("test", "hi");
+}
