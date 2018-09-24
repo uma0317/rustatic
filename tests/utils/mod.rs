@@ -32,3 +32,20 @@ fn render_test() {
         Err(e) => println!("{}", e)
     };
 }
+
+
+#[test]
+fn get_all_articles_test() {
+    println!("{:?}", utils::get_all_articles());
+    println!("{:?}", utils::get_all_articles().unwrap().len());
+}
+
+#[test]
+fn create_articles_list_test() {
+    println!("{:?}", utils::create_articles_list());
+}
+
+#[test]
+fn generate_index_html_test() {
+    println!("{:?}", utils::generate_index_html());
+}
