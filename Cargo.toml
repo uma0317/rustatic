@@ -5,3 +5,6 @@ authors = ["uma0317 <blog3170@gmail.com>"]
 
 [dependencies]
 comrak = "0.3"
+serde = "1.0"
+serde_json = "1.0"
+clap = "2.32.0"
