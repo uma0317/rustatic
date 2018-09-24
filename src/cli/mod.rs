@@ -7,7 +7,7 @@ use std::path::Path;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use { utils, SOURCE_PATH, SOURCE_POSTS_PATH, GENERATED_POSTS_PATH, LAYOUTS_POSTS_PATH };
+use { utils, SOURCE_PATH, SOURCE_POSTS_PATH, DIST_POSTS_PATH, LAYOUTS_POSTS_PATH };
 
 pub fn init() {
     let matches = build().get_matches();
@@ -66,7 +66,7 @@ pub fn arg_init(matches: &ArgMatches) -> io::Result<()>{
             fs::create_dir(blog_name)?;
             fs::create_dir(format!("{}/{}", blog_name, SOURCE_PATH));
             fs::create_dir(format!("{}/{}", blog_name, SOURCE_POSTS_PATH));
-            fs::create_dir(format!("{}/{}", blog_name, GENERATED_POSTS_PATH));
+            fs::create_dir(format!("{}/{}", blog_name, DIST_POSTS_PATH));
             fs::create_dir(format!("{}/{}", blog_name, LAYOUTS_POSTS_PATH));
         }
     }
