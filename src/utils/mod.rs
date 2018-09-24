@@ -41,51 +41,48 @@ pub fn create_html_file(dist_posts_path: &Path, name: &str, contents: &str) -> i
 }
 
 pub fn generate_html_files() -> io::Result<()> {
-
-
     let dist_posts_path = Path::new(DIST_POSTS_PATH);
     let source_posts_path = Path::new(SOURCE_POSTS_PATH);
-    println!("{:?}", dist_posts_path);
-    match functional(&source_posts_path, &dist_posts_path) {
+    
+    match functional_generate(&source_posts_path, &dist_posts_path) {
         Ok(_) => {},
         Err(e) => println!("{}", e),
     };
     Ok(())
 }
 
-pub fn functional(src_path: &Path, dist_path: &Path) -> io::Result<()> {
+pub fn functional_generate(src_path: &Path, dist_path: &Path) -> io::Result<()> {
     for entry in fs::read_dir(src_path)? {
-        let entry                = entry?;
-        let entry_path           = entry.path();
+        let entry      = entry?;
+        let entry_path = entry.path();
 
         if entry_path.is_dir() {
             let generated_entry_path = dist_path.join(entry.file_name().to_str().unwrap());
             if(!&generated_entry_path.exists()) {
                 fs::create_dir(&generated_entry_path);
             }
-            functional(&entry_path, &generated_entry_path);
+            functional_generate(&entry_path, &generated_entry_path);
             continue;
         }
 
-        println!("will create");
-        let mut tera = Tera::new("./source/_layouts/*.html").unwrap();
-        tera.autoescape_on(vec![]);
+        let mut tera    = Tera::new("source/_layouts/*.html").unwrap();
         let mut context = Context::new();
+
+        tera.autoescape_on(vec![]);
         context.add("header", &"test");
 
-        let mut buf_reader = BufReader::new(fs::File::open(entry.path())?);
+        let mut buf_reader  = BufReader::new(fs::File::open(entry.path())?);
         let mut md_contents = String::new();
         buf_reader.read_to_string(&mut md_contents)?;
 
-        let html_contents = md_to_html(&md_contents);
-        let full_file_name = entry.file_name().into_string().unwrap();
+        let html_contents        = md_to_html(&md_contents);
+        let full_file_name       = entry.file_name().into_string().unwrap();
         let file_name: Vec<&str> = full_file_name.split(".md").collect();
-        // println!("{:?}", file_name);
+
         context.add("page_title", file_name[0]);
         context.add("contents", &html_contents);
-        let rendered_html = tera.render("layout.html", &context).unwrap();
 
-        println!("path: {:?}", src_path);
+        let rendered_html = tera.render("layout.html", &context).unwrap();
         create_html_file(dist_path, file_name[0], &rendered_html);
     }
 
