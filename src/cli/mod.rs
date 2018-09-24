@@ -3,11 +3,14 @@ use chrono::prelude::*;
 
 use std::fs;
 use std::io;
+use std::io::{ Write, BufReader };
+use std::io::prelude::*;
 use std::path::Path;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use { utils, SOURCE_PATH, SOURCE_POSTS_PATH, DIST_POSTS_PATH, LAYOUTS_POSTS_PATH };
+use utils;
+use statics::{ SOURCE_PATH, SOURCE_POSTS_PATH, SOURCE_LAYOUTS_PATH, DIST_POSTS_PATH };
 
 pub fn init() {
     let matches = build().get_matches();
@@ -66,8 +69,37 @@ pub fn arg_init(matches: &ArgMatches) -> io::Result<()>{
             fs::create_dir(blog_name)?;
             fs::create_dir(format!("{}/{}", blog_name, SOURCE_PATH));
             fs::create_dir(format!("{}/{}", blog_name, SOURCE_POSTS_PATH));
+            fs::create_dir(format!("{}/{}", blog_name, SOURCE_LAYOUTS_PATH));
             fs::create_dir(format!("{}/{}", blog_name, DIST_POSTS_PATH));
-            fs::create_dir(format!("{}/{}", blog_name, LAYOUTS_POSTS_PATH));
+            fs::File::create(format!("{}/{}/{}", blog_name, SOURCE_LAYOUTS_PATH, "header.html"));
+            let mut layout_file   = fs::File::create(format!("{}/{}/{}", blog_name, SOURCE_LAYOUTS_PATH, "layout.html"))?;
+            let mut articles_file = fs::File::create(format!("{}/{}/{}", blog_name, SOURCE_LAYOUTS_PATH, "articles.html"))?;
+
+            let layout_content = "
+<!DOCTYPE html>
+<html lang=\"en\">
+<head>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">
+    <title>{{ page_title }}</title>
+</head>
+<body>
+    {{ header }}
+    {{ contents }}
+</body>
+</html>
+            ";
+
+            let articles_content = "
+{% for article in articles %}
+<div>
+    <a href=\"{{ article.path }}\">{{ article.title }}</a>
+</div>
+{% endfor %}
+            ";
+            layout_file.write_all(layout_content.as_bytes())?;
+            articles_file.write_all(articles_content.as_bytes())?;
         }
     }
 
@@ -84,9 +116,6 @@ pub fn arg_new(matches: &ArgMatches) -> io::Result<()> {
             let month_path = year_path.join(date.month().to_string());
             let day_path   = month_path.join(date.day().to_string());
 
-            println!("{:?}", year_path);
-            println!("{:?}", month_path);
-            println!("{:?}", day_path);
             if(!year_path.exists()) {
                 fs::create_dir(year_path);
             }
@@ -113,6 +142,7 @@ pub fn arg_new(matches: &ArgMatches) -> io::Result<()> {
 pub fn arg_generate(matches: &ArgMatches) -> io::Result<()> {
     if let Some(ref matches) = matches.subcommand_matches("generate") {
         utils::generate_html_files();
+        utils::generate_index_html();
     }
 
     Ok(())
