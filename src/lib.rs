@@ -1,10 +1,10 @@
 #[macro_use]
 extern crate comrak;
+extern crate tera;
 extern crate clap;
 extern crate chrono;
 
 pub mod utils;
-pub mod generate;
 pub mod cli;
 
 pub static SOURCE_PATH: &'static str          = "source";
